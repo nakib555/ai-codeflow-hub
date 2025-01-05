@@ -6,8 +6,19 @@ import { FileExplorer } from "./FileExplorer";
 import { CodePreview } from "./CodePreview";
 import { fileStructure } from "@/data/fileStructure";
 
-export const CodePanel = () => {
+interface CodePanelProps {
+  onFileSelect?: (content: string) => void;
+}
+
+export const CodePanel = ({ onFileSelect }: CodePanelProps) => {
   const [selectedFileContent, setSelectedFileContent] = useState<string>('// Click on a file to view its contents');
+
+  const handleFileSelect = (content: string) => {
+    setSelectedFileContent(content);
+    if (onFileSelect) {
+      onFileSelect(content);
+    }
+  };
 
   return (
     <div className="editor-panel h-full flex flex-col">
@@ -30,7 +41,7 @@ export const CodePanel = () => {
           <ResizablePanel defaultSize={25} minSize={20}>
             <FileExplorer 
               fileStructure={fileStructure}
-              onFileSelect={setSelectedFileContent}
+              onFileSelect={handleFileSelect}
             />
           </ResizablePanel>
           
@@ -39,7 +50,7 @@ export const CodePanel = () => {
           <ResizablePanel defaultSize={75}>
             <div className="h-full flex flex-col">
               <div className="flex-none p-2 border-b border-gray-800">
-                <h3 className="text-sm font-medium">Code Preview</h3>
+                <h3 className="text-sm font-medium">Preview</h3>
               </div>
               <CodePreview content={selectedFileContent} />
             </div>

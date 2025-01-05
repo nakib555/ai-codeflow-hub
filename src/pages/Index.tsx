@@ -1,10 +1,25 @@
 import { ChatPanel } from "@/components/ChatPanel";
 import { CodePanel } from "@/components/CodePanel";
+import { Preview } from "@/components/Preview";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 
 const Index = () => {
   const isMobile = useIsMobile();
+  const [previewContent, setPreviewContent] = useState<string | null>(null);
+
+  const handleFileSelect = (content: string) => {
+    setPreviewContent(content);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewContent(null);
+  };
+
+  if (previewContent !== null) {
+    return <Preview content={previewContent} onClose={handleClosePreview} />;
+  }
 
   return (
     <div className="h-screen w-full">
@@ -20,7 +35,7 @@ const Index = () => {
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={70}>
           <div className="h-full">
-            <CodePanel />
+            <CodePanel onFileSelect={handleFileSelect} />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
