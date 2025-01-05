@@ -5,8 +5,16 @@ import { Play, Terminal, FolderOpen, ChevronRight, ChevronDown, File, Folder } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
+type FileType = "file" | "folder";
+
+interface FileStructureItem {
+  name: string;
+  type: FileType;
+  children?: FileStructureItem[];
+}
+
 // Mock file structure - in a real app this would come from your backend
-const fileStructure = [
+const fileStructure: FileStructureItem[] = [
   {
     name: 'src',
     type: 'folder',
@@ -34,11 +42,7 @@ const fileStructure = [
 ];
 
 interface FileItemProps {
-  item: {
-    name: string;
-    type: 'file' | 'folder';
-    children?: typeof fileStructure;
-  };
+  item: FileStructureItem;
   level?: number;
 }
 
