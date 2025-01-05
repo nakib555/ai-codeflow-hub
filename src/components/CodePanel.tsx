@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Play, Terminal, FolderOpen, ChevronRight, ChevronDown, File, Folder } from "lucide-react";
@@ -10,10 +10,11 @@ type FileType = "file" | "folder";
 interface FileStructureItem {
   name: string;
   type: FileType;
+  content?: string;
   children?: FileStructureItem[];
 }
 
-// Mock file structure - in a real app this would come from your backend
+// Mock file structure with content
 const fileStructure: FileStructureItem[] = [
   {
     name: 'src',
@@ -23,20 +24,88 @@ const fileStructure: FileStructureItem[] = [
         name: 'components',
         type: 'folder',
         children: [
-          { name: 'Button.tsx', type: 'file' },
-          { name: 'Input.tsx', type: 'file' },
+          { 
+            name: 'Button.tsx', 
+            type: 'file',
+            content: `import React from 'react';
+
+const Button = ({ children }) => {
+  return (
+    <button className="px-4 py-2 bg-blue-500 text-white rounded">
+      {children}
+    </button>
+  );
+};
+
+export default Button;`
+          },
+          { 
+            name: 'Input.tsx', 
+            type: 'file',
+            content: `import React from 'react';
+
+const Input = ({ placeholder }) => {
+  return (
+    <input 
+      className="border rounded px-3 py-2" 
+      placeholder={placeholder}
+    />
+  );
+};
+
+export default Input;`
+          },
         ]
       },
-      { name: 'App.tsx', type: 'file' },
-      { name: 'index.tsx', type: 'file' },
+      { 
+        name: 'App.tsx', 
+        type: 'file',
+        content: `import React from 'react';
+import Button from './components/Button';
+
+function App() {
+  return (
+    <div className="app">
+      <h1>Welcome to My App</h1>
+      <Button>Click me</Button>
+    </div>
+  );
+}`
+      },
+      { 
+        name: 'index.tsx', 
+        type: 'file',
+        content: `import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);`
+      },
     ]
   },
   {
     name: 'public',
     type: 'folder',
     children: [
-      { name: 'index.html', type: 'file' },
-      { name: 'favicon.ico', type: 'file' },
+      { 
+        name: 'index.html', 
+        type: 'file',
+        content: `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>My App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>`
+      },
     ]
   },
 ];
@@ -44,11 +113,20 @@ const fileStructure: FileStructureItem[] = [
 interface FileItemProps {
   item: FileStructureItem;
   level?: number;
+  onFileSelect?: (content: string) => void;
 }
 
-const FileItem: React.FC<FileItemProps> = ({ item, level = 0 }) => {
+const FileItem: React.FC<FileItemProps> = ({ item, level = 0, onFileSelect }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const hasChildren = item.type === 'folder' && item.children?.length;
+
+  const handleClick = () => {
+    if (item.type === 'folder') {
+      setIsOpen(!isOpen);
+    } else if (item.content && onFileSelect) {
+      onFileSelect(item.content);
+    }
+  };
 
   return (
     <div>
@@ -57,7 +135,7 @@ const FileItem: React.FC<FileItemProps> = ({ item, level = 0 }) => {
           "flex items-center py-1 px-2 hover:bg-gray-800 rounded cursor-pointer text-sm",
           { 'ml-4': level > 0 }
         )}
-        onClick={() => hasChildren && setIsOpen(!isOpen)}
+        onClick={handleClick}
       >
         {hasChildren ? (
           isOpen ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />
@@ -70,13 +148,20 @@ const FileItem: React.FC<FileItemProps> = ({ item, level = 0 }) => {
         <span>{item.name}</span>
       </div>
       {isOpen && item.children?.map((child, index) => (
-        <FileItem key={`${child.name}-${index}`} item={child} level={level + 1} />
+        <FileItem 
+          key={`${child.name}-${index}`} 
+          item={child} 
+          level={level + 1} 
+          onFileSelect={onFileSelect}
+        />
       ))}
     </div>
   );
 };
 
 export const CodePanel = () => {
+  const [selectedFileContent, setSelectedFileContent] = useState<string>('// Click on a file to view its contents');
+
   return (
     <div className="editor-panel h-full flex flex-col">
       <div className="flex-none p-4 border-b border-gray-800 flex justify-between items-center">
@@ -99,7 +184,11 @@ export const CodePanel = () => {
             <ScrollArea className="h-full">
               <div className="p-4 space-y-1">
                 {fileStructure.map((item, index) => (
-                  <FileItem key={`${item.name}-${index}`} item={item} />
+                  <FileItem 
+                    key={`${item.name}-${index}`} 
+                    item={item} 
+                    onFileSelect={setSelectedFileContent}
+                  />
                 ))}
               </div>
             </ScrollArea>
@@ -111,11 +200,7 @@ export const CodePanel = () => {
             <ScrollArea className="h-full">
               <div className="p-4">
                 <pre className="text-sm font-mono">
-                  <code>{`// Your code will appear here
-function greeting() {
-  console.log("Welcome to the next-gen dev platform!");
-}
-`}</code>
+                  <code>{selectedFileContent}</code>
                 </pre>
               </div>
             </ScrollArea>
