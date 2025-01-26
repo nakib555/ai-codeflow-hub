@@ -1,14 +1,14 @@
 import * as React from "react"
-import { type OTPInputProps, OTPProvider, OTPContext } from "input-otp"
+import { OTPInput } from "input-otp"
 import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 const InputOTP = React.forwardRef<
-  HTMLDivElement,
-  Omit<OTPInputProps, "ref">
+  React.ElementRef<typeof OTPInput>,
+  React.ComponentPropsWithoutRef<typeof OTPInput>
 >(({ className, containerClassName, ...props }, ref) => (
-  <OTPProvider
+  <OTPInput
     ref={ref}
     containerClassName={cn(
       "flex items-center gap-2 has-[:disabled]:opacity-50",
@@ -32,8 +32,8 @@ const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
 >(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] || {}
+  const inputOTPContext = React.useContext(OTPInput.Context)
+  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots?.[index] ?? {}
 
   return (
     <div
