@@ -1,29 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
-    import { Button } from "@/components/ui/button";
-    import { Input } from "@/components/ui/input";
-    import { ScrollArea } from "@/components/ui/scroll-area";
-    import { Send } from "lucide-react";
-    import ReactMarkdown from 'react-markdown';
-    import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-    import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-    import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Send } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-    const API_KEY = "AIzaSyBrseV2BcpmajnWNmi8FV4g9AhAEMN3HJ0";
+const API_KEY = "AIzaSyBrseV2BcpmajnWNmi8FV4g9AhAEMN3HJ0";
 
-    interface Message {
-      sender: 'user' | 'bot';
-      text: string;
-      displayingText?: string;
-    }
+interface Message {
+  sender: 'user' | 'bot';
+  text: string;
+  displayingText?: string;
+}
 
-    export const ChatPanel = () => {
-      const [messages, setMessages] = useState<Message[]>([
-        { sender: 'bot', text: "Welcome! I'm your AI assistant. How can I help you today?", displayingText: "Welcome! I'm your AI assistant. How can I help you today?" },
-      ]);
-      const [input, setInput] = useState('');
-      const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-      const scrollAreaRef = useRef<HTMLDivElement>(null);
-      const [selectedModel, setSelectedModel] = useState('gemini-pro');
+export const ChatPanel = () => {
+  const [messages, setMessages] = useState<Message[]>([
+    { sender: 'bot', text: "Welcome! I'm your AI assistant. How can I help you today?", displayingText: "Welcome! I'm your AI assistant. How can I help you today?" },
+  ]);
+  const [input, setInput] = useState('');
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [selectedModel, setSelectedModel] = useState('gemini-pro');
 
       const sendMessage = async () => {
         if (!input.trim()) return;
@@ -96,59 +96,60 @@ import React, { useState, useEffect, useRef } from 'react';
         }
       }, [messages]);
 
-      const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setInput(event.target.value);
-      };
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(event.target.value);
+  };
 
-      return (
-        <div className="chat-panel h-full flex flex-col">
-          <div className="flex-none p-4 border-b flex items-center justify-between">
-            <h2 className="text-lg font-semibold">AI Assistant</h2>
-            <Select onValueChange={setSelectedModel} defaultValue={selectedModel}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gemini-pro">gemini-pro</SelectItem>
-                <SelectItem value="gemini-2.0-flash-exp">gemini-2.0-flash-exp</SelectItem>
-                <SelectItem value="gemini-1.5-pro">gemini-1.5-pro</SelectItem>
-                <SelectItem value="gemini-1.5-flash-8b">gemini-1.5-flash-8b</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={message.sender === 'user' ? 'bg-primary/10 p-3 rounded-lg text-right' : 'bg-secondary p-3 rounded-lg'}
-                >
-                  {message.sender === 'bot' ? (
-                    <div className="whitespace-pre-wrap overflow-x-auto">
-                      <ReactMarkdown
-                        className="text-sm"
-                        components={{
-                          code({node, inline, className, children, ...props}) {
-                            const match = (className || '').match(/language-(?<lang>[\w-]+)/);
-                            return !inline ? (
-                              <pre className="bg-gray-800 text-white p-2 rounded-md overflow-auto" style={{ wordBreak: 'break-word' }}>
-                                <SyntaxHighlighter
-                                  language={match?.groups?.lang || 'javascript'}
-                                  style={dracula}
-                                  PreTag="pre"
-                                  codeTagProps={{ style: { whiteSpace: 'pre-wrap' } }}
-                                  {...props}
-                                >
-                                  {String(children).replace(/\n$/, '')}
-                                </SyntaxHighlighter>
-                              </pre>
-                            ) : (
-                              <code className={className} {...props}>
-                                {children}
-                              </code>
-                            );
-                          },
+  return (
+    <div className="chat-panel h-full flex flex-col">
+      <div className="flex-none p-4 border-b flex items-center justify-between">
+        <h2 className="text-lg font-semibold">AI Assistant</h2>
+        <Select onValueChange={setSelectedModel} defaultValue={selectedModel}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="gemini-pro">gemini-pro</SelectItem>
+            <SelectItem value="gemini-2.0-flash-exp">gemini-2.0-flash-exp</SelectItem>
+            <SelectItem value="gemini-1.5-pro">gemini-1.5-pro</SelectItem>
+            <SelectItem value="gemini-1.5-flash-8b">gemini-1.5-flash-8b</SelectItem>
+            <SelectItem value="gemini-2.0-flash-thinking-exp-01-21">gemini-2.0-flash-thinking-exp-01-21</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
+        <div className="space-y-4">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={message.sender === 'user' ? 'bg-primary/10 p-3 rounded-lg text-right' : 'bg-secondary p-3 rounded-lg'}
+            >
+              {message.sender === 'bot' ? (
+                <div className="whitespace-pre-wrap overflow-x-auto">
+                  <ReactMarkdown
+                    className="text-sm"
+                    components={{
+                      code({node, inline, className, children, ...props}) {
+                        const match = (className || '').match(/language-(?<lang>[\w-]+)/);
+                        return !inline ? (
+                          <pre className="bg-gray-800 text-white p-2 rounded-md overflow-auto" style={{ wordBreak: 'break-word' }}>
+                            <SyntaxHighlighter
+                              language={match?.groups?.lang || 'javascript'}
+                              style={dracula}
+                              PreTag="pre"
+                              codeTagProps={{ style: { whiteSpace: 'pre-wrap' } }}
+                              {...props}
+                            >
+                              {String(children).replace(/\n$/, '')}
+                            </SyntaxHighlighter>
+                          </pre>
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
                           blockquote: ({node, ...props}) => (
                             <blockquote className="border-l-4 border-gray-300 pl-4 my-2" {...props} />
                           ),
@@ -170,35 +171,35 @@ import React, { useState, useEffect, useRef } from 'react';
                           span: ({node, ...props}) => (
                             <span className="bg-yellow-200" {...props} />
                           )
-                        }}
-                      >
-                        {message.displayingText}
-                      </ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="text-sm">{message.text}</p>
-                  )}
+                    }}
+                  >
+                    {message.displayingText}
+                  </ReactMarkdown>
                 </div>
-              ))}
+              ) : (
+                <p className="text-sm">{message.text}</p>
+              )}
             </div>
-          </ScrollArea>
-
-          <div className="flex-none p-4 border-t">
-            <form className="flex gap-2" onSubmit={(e) => {
-              e.preventDefault();
-              sendMessage();
-            }}>
-              <Input 
-                placeholder="Type your message..." 
-                className="flex-grow"
-                value={input}
-                onChange={handleInputChange}
-              />
-              <Button type="submit" size="icon">
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </div>
+          ))}
         </div>
-      );
-    };
+      </ScrollArea>
+
+      <div className="flex-none p-4 border-t">
+        <form className="flex gap-2" onSubmit={(e) => {
+          e.preventDefault();
+          sendMessage();
+        }}>
+          <Input 
+            placeholder="Type your message..." 
+            className="flex-grow"
+            value={input}
+            onChange={handleInputChange}
+          />
+          <Button type="submit" size="icon">
+            <Send className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+};
